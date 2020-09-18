@@ -37,6 +37,10 @@ func RegisterRouter(router *gin.Engine, configData *configuration.ConfigData) {
 
 	router.GET("api/crypto/v1/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	router.GET("api/crypto/healthz", healthController.GetHealth)
 
+	routerGroup := router.Group("/api")
+	{
+		routerGroup.GET("api/crypto/healthz", healthController.GetHealth)
+		routerGroup.POST("/crypto/decrypt", cryptoController.Decrypt)
+	}
 }

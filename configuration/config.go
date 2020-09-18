@@ -9,6 +9,8 @@ type ConfigData struct {
 	TracingOCAgentHost string                       `json:"tracing_oc_agent_host" binding:"required"`
 	DBConnectionPool   model.DBConnectionPoolConfig `json:"dbConnectionPool" binding:"required"`
 	LogLevel           string                       `json:"log_level" binding:"required"`
+	Environment        string                       `json:"environment"`
+	AllowedOrigins     []string                     `json:"allowed_origins"`
 }
 
 func (configData *ConfigData) GetDBConnectionPoolConfig() model.DBConnectionPoolConfig {

@@ -1,5 +1,54 @@
+definitions:
+  golaerror.Error:
+    properties:
+      additionalData:
+        type: additionalData
+      errorCode:
+        type: string
+      errorMessage:
+        type: string
+    type: object
+  request.DecryptRequest:
+    properties:
+      encrypted_text:
+        type: string
+    required:
+    - encrypted_text
+    type: object
+  response.DecryptResponse:
+    properties:
+      decrypted_text:
+        type: string
+    type: object
 info:
   contact: {}
   license: {}
-paths: {}
+paths:
+  /api/crypto/decrypt:
+    post:
+      consumes:
+      - application/json
+      description: This API will takes encrypted string and return the decrypted one
+      parameters:
+      - description: Set decrypt request payload
+        in: body
+        name: DecryptRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.DecryptRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.DecryptResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/golaerror.Error'
+        "500": {}
+      summary: Decrypt string
+      tags:
+      - Decrypt
 swagger: "2.0"

@@ -24,7 +24,84 @@ var doc = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/api/crypto/decrypt": {
+            "post": {
+                "description": "This API will takes encrypted string and return the decrypted one",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Decrypt"
+                ],
+                "summary": "Decrypt string",
+                "parameters": [
+                    {
+                        "description": "Set decrypt request payload",
+                        "name": "DecryptRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.DecryptRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.DecryptResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/golaerror.Error"
+                        }
+                    },
+                    "500": {}
+                }
+            }
+        }
+    },
+    "definitions": {
+        "golaerror.Error": {
+            "type": "object",
+            "properties": {
+                "additionalData": {
+                    "type": "additionalData"
+                },
+                "errorCode": {
+                    "type": "string"
+                },
+                "errorMessage": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.DecryptRequest": {
+            "type": "object",
+            "required": [
+                "encrypted_text"
+            ],
+            "properties": {
+                "encrypted_text": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.DecryptResponse": {
+            "type": "object",
+            "properties": {
+                "decrypted_text": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }`
 
 type swaggerInfo struct {
