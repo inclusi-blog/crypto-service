@@ -9,7 +9,7 @@ import (
 
 var (
 	healthController = controller.HealthController{}
-	cryptoController  controller.CryptoController
+	cryptoController controller.CryptoController
 )
 
 func Objects(configData *configuration.ConfigData) {
