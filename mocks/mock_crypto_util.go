@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	rsa "crypto/rsa"
 	gin "github.com/gin-gonic/gin"
 	golaerror "github.com/gola-glitch/gola-utils/golaerror"
@@ -36,18 +37,18 @@ func (m *MockCryptoUtil) EXPECT() *MockCryptoUtilMockRecorder {
 }
 
 // Decrypt mocks base method
-func (m *MockCryptoUtil) Decrypt(key *rsa.PrivateKey, encryptedText string) (string, *golaerror.Error) {
+func (m *MockCryptoUtil) Decrypt(key *rsa.PrivateKey, encryptedText string, ctx context.Context) (string, *golaerror.Error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Decrypt", key, encryptedText)
+	ret := m.ctrl.Call(m, "Decrypt", key, encryptedText, ctx)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(*golaerror.Error)
 	return ret0, ret1
 }
 
 // Decrypt indicates an expected call of Decrypt
-func (mr *MockCryptoUtilMockRecorder) Decrypt(key, encryptedText interface{}) *gomock.Call {
+func (mr *MockCryptoUtilMockRecorder) Decrypt(key, encryptedText, ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decrypt", reflect.TypeOf((*MockCryptoUtil)(nil).Decrypt), key, encryptedText)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decrypt", reflect.TypeOf((*MockCryptoUtil)(nil).Decrypt), key, encryptedText, ctx)
 }
 
 // GetPrivateKey mocks base method

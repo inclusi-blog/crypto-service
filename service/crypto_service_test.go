@@ -47,7 +47,7 @@ func (suite *CryptoServiceTestSuite) TearDownTest() {
 
 func (suite CryptoServiceTestSuite) TestShouldReturnDecryptedTextForGivenEncryptedText() {
 	suite.cryptoUtil.EXPECT().GetPrivateKey(suite.context, constants.PASSWORD_PRIVATE_KEY).Return(suite.privateKey, nil)
-	suite.cryptoUtil.EXPECT().Decrypt(suite.privateKey, "random_text").Return("decrypted_text", nil)
+	suite.cryptoUtil.EXPECT().Decrypt(suite.privateKey, "random_text", suite.context).Return("decrypted_text", nil)
 	decryptedResponse, err := suite.cryptoService.Decrypt(suite.context, "random_text")
 	suite.Nil(err)
 	suite.Equal("decrypted_text", decryptedResponse.DecryptedText)
@@ -61,7 +61,7 @@ func (suite CryptoServiceTestSuite) TestShouldReturnErrorWhenPrivateKeyForPasswo
 
 func (suite CryptoServiceTestSuite) TestShouldReturnErrorWhenDecryptionFails() {
 	suite.cryptoUtil.EXPECT().GetPrivateKey(suite.context, constants.PASSWORD_PRIVATE_KEY).Return(suite.privateKey, nil)
-	suite.cryptoUtil.EXPECT().Decrypt(suite.privateKey, "random_text").Return("", &constants.DecryptionError)
+	suite.cryptoUtil.EXPECT().Decrypt(suite.privateKey, "random_text", suite.context).Return("", &constants.DecryptionError)
 	_, err := suite.cryptoService.Decrypt(suite.context, "random_text")
 	suite.NotNil(err)
 }

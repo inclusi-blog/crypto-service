@@ -45,10 +45,10 @@ func (utils cryptoUtil) Decrypt(key *rsa.PrivateKey, encryptedText string, ctx c
 }
 
 func (utils cryptoUtil) GetPrivateKey(ctx *gin.Context, key string) (*rsa.PrivateKey, error) {
-	logger := logging.GetLogger(ctx)
+	logger := logging.GetLogger(ctx).WithField("class", "CryptoUtil").WithField("method", "GetPrivateKey")
 	fileData, fileError := getKeyData(key)
 	if fileError != nil {
-		logger.Error("Error in reading private key")
+		logger.Errorf("Error in reading private key %v", fileError)
 		return nil, fileError
 	}
 
@@ -59,7 +59,7 @@ func (utils cryptoUtil) GetPrivateKey(ctx *gin.Context, key string) (*rsa.Privat
 	}
 	privateKey, parsingError := x509.ParsePKCS1PrivateKey(data.Bytes)
 	if parsingError != nil {
-		logger.Error("Error in parsing a private key")
+		logger.Errorf("Error in parsing a private key %v", parsingError)
 		return nil, parsingError
 	}
 

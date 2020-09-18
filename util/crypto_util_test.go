@@ -35,12 +35,12 @@ func (suite *CryptoUtilTestSuite) SetupTest() {
 
 func (suite CryptoUtilTestSuite) TestShouldReturnErrorWhenDecodingFailsForGivenInput() {
 	privateKey, _ := suite.cryptoUtil.GetPrivateKey(suite.context, constants.PASSWORD_PRIVATE_KEY)
-	_, err := suite.cryptoUtil.Decrypt(privateKey, "encrypted_text")
+	_, err := suite.cryptoUtil.Decrypt(privateKey, "encrypted_text", suite.context)
 	suite.NotNil(err)
 }
 
 func (suite CryptoUtilTestSuite) TestShouldReturnErrorWhenAlgorithmDecryptionFails() {
 	privateKey, _ := suite.cryptoUtil.GetPrivateKey(suite.context, constants.PASSWORD_PRIVATE_KEY)
-	_, err := suite.cryptoUtil.Decrypt(privateKey, "aGVsbG8=")
+	_, err := suite.cryptoUtil.Decrypt(privateKey, "aGVsbG8=", suite.context)
 	suite.NotNil(err)
 }
