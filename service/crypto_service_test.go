@@ -109,7 +109,7 @@ func (suite CryptoServiceTestSuite) generateJWE() (model.IdToken, string) {
 	suite.publickeyMappingConfig.EXPECT().GetKeyData(constants.IDP_PUBLIC_KEY_ID).Return(keyData, nil)
 	suite.cryptoUtil.EXPECT().GetPublicKey(suite.context, constants.PUBLIC_KEY, constants.PKCS1PublicKey).Return(suite.publicKey, nil)
 	encrypter, _ := jose.NewEncrypter(jose.A128GCM, jose.Recipient{Algorithm: jose.RSA_OAEP, Key: suite.publicKey}, nil)
-	suite.cryptoUtil.EXPECT().GetEncrypter(suite.context, suite.publicKey).Return(encrypter, nil)
+	suite.cryptoUtil.EXPECT().GetEncryptor(suite.context, suite.publicKey).Return(encrypter, nil)
 	jweRequest := request.JWERequest{
 		PublicKeyId: constants.IDP_PUBLIC_KEY_ID,
 		Payload:     idToken,
@@ -154,7 +154,7 @@ func (suite CryptoServiceTestSuite) TestEncryptPayloadToJWEShouldReturnJWETokenW
 	suite.publickeyMappingConfig.EXPECT().GetKeyData(pubKeyID).Return(keyData, nil).Times(1)
 	suite.cryptoUtil.EXPECT().GetPublicKey(suite.context, pubKeyID, constants.PKIXPublicKey).Return(suite.publicKey, nil).Times(1)
 	encrypter, _ := jose.NewEncrypter(jose.A256GCM, jose.Recipient{Algorithm: jose.RSA_OAEP_256, Key: suite.publicKey}, nil)
-	suite.cryptoUtil.EXPECT().GetEncrypter(suite.context, suite.publicKey).Return(encrypter, nil).Times(1)
+	suite.cryptoUtil.EXPECT().GetEncryptor(suite.context, suite.publicKey).Return(encrypter, nil).Times(1)
 	_, cryptoError := suite.cryptoService.EncryptPayloadToJWE(suite.context, jweRequest)
 	suite.Nil(cryptoError)
 
@@ -195,7 +195,7 @@ func (suite CryptoServiceTestSuite) TestEncryptPayloadToJWEShouldThrowErrorWhenS
 	errorMsg := "something went wrong"
 	suite.publickeyMappingConfig.EXPECT().GetKeyData(pubKeyID).Return(keyData, nil)
 	suite.cryptoUtil.EXPECT().GetPublicKey(suite.context, pubKeyID, constants.PKIXPublicKey).Return(suite.publicKey, nil)
-	suite.cryptoUtil.EXPECT().GetEncrypter(suite.context, suite.publicKey).Return(nil, errors.New(errorMsg))
+	suite.cryptoUtil.EXPECT().GetEncryptor(suite.context, suite.publicKey).Return(nil, errors.New(errorMsg))
 	_, cryptoError := suite.cryptoService.EncryptPayloadToJWE(suite.context, jweRequest)
 	suite.Equal(&constants.InternalServerError, cryptoError)
 
@@ -234,7 +234,7 @@ func (suite CryptoServiceTestSuite) TestShouldReturnJWEWhenValidJWTisProvided() 
 	suite.cryptoUtil.EXPECT().GetPublicKey(suite.context, constants.PUBLIC_KEY, constants.PKCS1PublicKey).Return(suite.publicKey, nil)
 
 	encrypter, _ := jose.NewEncrypter(jose.A128GCM, jose.Recipient{Algorithm: jose.RSA_OAEP, Key: suite.publicKey}, nil)
-	suite.cryptoUtil.EXPECT().GetEncrypter(suite.context, suite.publicKey).Return(encrypter, nil)
+	suite.cryptoUtil.EXPECT().GetEncryptor(suite.context, suite.publicKey).Return(encrypter, nil)
 
 	actualJWE, _ := suite.cryptoService.EncryptPayloadToJWE(suite.context, jweRequest)
 

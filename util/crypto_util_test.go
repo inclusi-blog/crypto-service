@@ -156,12 +156,12 @@ func (suite CryptoUtilTestSuite) TestShouldThrowErrorWhenKeyIsOfInvalidFormat() 
 
 func (suite CryptoUtilTestSuite) TestShouldNotReturnErrorIfValidPublicKeyIsPassed() {
 	publicKey, _ := suite.cryptoUtil.GetPublicKey(suite.context, constants.PUBLIC_KEY, constants.PKIXPublicKey)
-	_, encrypterError := suite.cryptoUtil.GetEncrypter(suite.context, publicKey)
+	_, encrypterError := suite.cryptoUtil.GetEncryptor(suite.context, publicKey)
 
 	suite.Nil(encrypterError)
 }
 
 func (suite CryptoUtilTestSuite) TestShouldReturnErrorIfInvalidPublicKeyIsPassed() {
-	_, encrypterError := suite.cryptoUtil.GetEncrypter(suite.context, nil)
+	_, encrypterError := suite.cryptoUtil.GetEncryptor(suite.context, nil)
 	suite.NotNil(encrypterError)
 }

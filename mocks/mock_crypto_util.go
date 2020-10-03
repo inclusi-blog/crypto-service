@@ -69,19 +69,19 @@ func (mr *MockCryptoUtilMockRecorder) Decrypt(key, encryptedText, ctx interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decrypt", reflect.TypeOf((*MockCryptoUtil)(nil).Decrypt), key, encryptedText, ctx)
 }
 
-// GetEncrypter mocks base method
-func (m *MockCryptoUtil) GetEncrypter(ctx *gin.Context, publicKey *rsa.PublicKey) (go_jose_v2.Encrypter, error) {
+// GetEncryptor mocks base method
+func (m *MockCryptoUtil) GetEncryptor(ctx *gin.Context, publicKey *rsa.PublicKey) (go_jose_v2.Encrypter, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetEncrypter", ctx, publicKey)
+	ret := m.ctrl.Call(m, "GetEncryptor", ctx, publicKey)
 	ret0, _ := ret[0].(go_jose_v2.Encrypter)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetEncrypter indicates an expected call of GetEncrypter
-func (mr *MockCryptoUtilMockRecorder) GetEncrypter(ctx, publicKey interface{}) *gomock.Call {
+// GetEncryptor indicates an expected call of GetEncryptor
+func (mr *MockCryptoUtilMockRecorder) GetEncryptor(ctx, publicKey interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEncrypter", reflect.TypeOf((*MockCryptoUtil)(nil).GetEncrypter), ctx, publicKey)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEncryptor", reflect.TypeOf((*MockCryptoUtil)(nil).GetEncryptor), ctx, publicKey)
 }
 
 // GetPrivateKey mocks base method

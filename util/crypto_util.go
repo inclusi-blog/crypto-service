@@ -25,7 +25,7 @@ import (
 type CryptoUtil interface {
 	DecodeJwtToken(jwtToken string) (model.IdToken, error)
 	Decrypt(key *rsa.PrivateKey, encryptedText string, ctx context.Context) (string, *golaerror.Error)
-	GetEncrypter(ctx *gin.Context, publicKey *rsa.PublicKey) (goJoseV2.Encrypter, error)
+	GetEncryptor(ctx *gin.Context, publicKey *rsa.PublicKey) (goJoseV2.Encrypter, error)
 	GetPrivateKey(ctx *gin.Context, key string) (*rsa.PrivateKey, error)
 	GetPublicKey(ctx *gin.Context, key string, keyType constants.PublicKeyType) (*rsa.PublicKey, error)
 	EncodePayloadToJWTToken(payload string, key *rsa.PrivateKey) (string, error)
@@ -118,7 +118,7 @@ func (utils cryptoUtil) DecodeJwtToken(jwtToken string) (model.IdToken, error) {
 }
 
 func (utils cryptoUtil) GetPublicKey(ctx *gin.Context, key string, keyType constants.PublicKeyType) (*rsa.PublicKey, error) {
-	logger := logging.GetLogger(ctx)
+	logger := logging.GetLogger(ctx).WithField("class","CryptoUtil").WithField("method", "GetPublicKey")
 
 	fileData, fileError := getKeyData(key)
 	if fileError != nil {
@@ -153,14 +153,15 @@ func (utils cryptoUtil) GetPublicKey(ctx *gin.Context, key string, keyType const
 	return publicKey, nil
 }
 
-func (utils cryptoUtil) GetEncrypter(ctx *gin.Context, publicKey *rsa.PublicKey) (goJoseV2.Encrypter, error) {
-	logger := logging.GetLogger(ctx)
-	encrypter, err := goJoseV2.NewEncrypter(goJoseV2.A256GCM, goJoseV2.Recipient{Algorithm: goJoseV2.RSA_OAEP_256, Key: publicKey}, nil)
+func (utils cryptoUtil) GetEncryptor(ctx *gin.Context, publicKey *rsa.PublicKey) (goJoseV2.Encrypter, error) {
+	logger := logging.GetLogger(ctx).WithField("class", "CryptoUtil").WithField("method", "GetEncryptor")
+	encryptor, err := goJoseV2.NewEncrypter(goJoseV2.A256GCM, goJoseV2.Recipient{Algorithm: goJoseV2.RSA_OAEP_256, Key: publicKey}, nil)
 	if err != nil {
-		logger.Error("Error create an appropriate encrypter based on the key type.")
+		logger.Error("Error create an appropriate encryptor based on the key type.")
 		return nil, err
 	}
-	return encrypter, nil
+	logger.Info("Successfully got encryptor")
+	return encryptor, nil
 }
 
 

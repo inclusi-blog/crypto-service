@@ -90,48 +90,49 @@ func (cryptoService cryptoService) DecryptJWE(ctx *gin.Context, request string) 
 }
 
 func (cryptoService cryptoService) EncryptPayloadToJWE(ctx *gin.Context, request request.JWERequest) (model.JWEResponse, *golaerror.Error) {
-	logger := loggingUtils.GetLogger(ctx)
+	logger := loggingUtils.GetLogger(ctx).WithField("class", "CryptoService").WithField("method", "EncryptPayloadToJWE")
 
 	pubkeyData, err := cryptoService.configData.GetKeyData(request.PublicKeyId)
 	if err != nil {
+		logger.Error("error occurred while fetching public key from the requested public id ", err)
 		return model.JWEResponse{}, &constants.PayloadValidationError
 	}
 
 	publicKey, err := cryptoService.cryptoUtil.GetPublicKey(ctx, pubkeyData.EnvName, constants.PublicKeyType(pubkeyData.EncodingType))
 	if err != nil {
-		logger.Error("CryptoService.EncryptPayloadToJWE: Error in Finding Public key ", err)
+		logger.Error("Error in Finding Public key ", err)
 		return model.JWEResponse{}, &constants.InternalServerError
 	}
 	plaintext, _ := json.Marshal(request.Payload)
 
 	jweToken, tokenGenerationError := cryptoService.makeJWEFromString(ctx, publicKey, plaintext)
 	if tokenGenerationError != nil {
-		logger.Error("CryptoService.EncryptPayloadToJWE: Error in converting plaintext to jwe ", tokenGenerationError)
+		logger.Error("Error in converting plaintext to jwe ", tokenGenerationError)
 		return model.JWEResponse{}, &constants.InternalServerError
 	}
 	return model.JWEResponse{JWEToken: jweToken}, nil
 }
 
 func (cryptoService cryptoService) makeJWEFromString(ctx *gin.Context, publicKey *rsa.PublicKey, plaintext []byte) (string, error) {
-	logger := loggingUtils.GetLogger(ctx)
-	encrypter, err := cryptoService.cryptoUtil.GetEncrypter(ctx, publicKey)
+	logger := loggingUtils.GetLogger(ctx).WithField("class", "CryptoService").WithField("method", "makeJWEFromString")
+	encrypter, err := cryptoService.cryptoUtil.GetEncryptor(ctx, publicKey)
 	if err != nil {
-		logger.Error("CryptoService.makeJWEFromString: Error in getting encrypter ", err)
+		logger.Error("Error in getting encrypter ", err)
 		return "", err
 	}
 
 	encryptedJWEObject, err := encrypter.Encrypt(plaintext)
 	if err != nil {
-		logger.Error("CryptoService.makeJWEFromString: Error in encrypting JWT object ", err)
+		logger.Error("Error in encrypting JWT object ", err)
 		return "", err
 	}
 
 	jweToken, serializeError := encryptedJWEObject.CompactSerialize()
 	if serializeError != nil {
-		logger.Error("CryptoService.makeJWEFromString: Error in Serializing JWT token ", err)
+		logger.Error("Error in Serializing JWT token ", err)
 		return "", serializeError
 	}
 
-	logger.Info("CryptoService.makeJWEFromString.Successfully encrypted jwt token.")
+	logger.Info("Successfully encrypted jwt token.")
 	return jweToken, nil
 }

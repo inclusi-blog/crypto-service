@@ -71,7 +71,9 @@ func (cryptoController cryptoController) Decrypt(ctx *gin.Context) {
 // @Router /api/crypto/id-token/encrypt [get]
 func (cryptoController cryptoController) EncryptIdToken(ctx *gin.Context) {
 	idToken, idTokenError := cryptoController.getIdTokenFromContext(ctx)
+	logger := logging.GetLogger(ctx).WithField("class", "CryptoController").WithField("method", "EncryptIdToken")
 	if idTokenError != nil {
+		logger.Errorf("error occurred while fetching id token from cookie context %v", idTokenError)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -81,9 +83,13 @@ func (cryptoController cryptoController) EncryptIdToken(ctx *gin.Context) {
 	}
 	encryptedIdToken, inValidJWTError := cryptoController.cryptoService.EncryptPayloadToJWE(ctx, jweRequest)
 	if inValidJWTError != nil {
+		logger.Errorf("error occurred while encrypting payload to jwe %v", inValidJWTError)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, inValidJWTError)
 		return
 	}
+
+	logger.Info("Successfully encrypted payload to jme")
+	logger.Info("setting encrypted id token in cookie")
 
 	http.SetCookie(ctx.Writer, createCookie("enc_id_token", encryptedIdToken.JWEToken))
 	ctx.String(http.StatusOK, "")
@@ -98,19 +104,22 @@ func createCookie(name string, value string) *http.Cookie {
 
 func (cryptoController cryptoController) getIdTokenFromContext(ctx *gin.Context) (model.IdToken, error) {
 	jwtToken, _ := ctx.Cookie("id_token")
+	logger := logging.GetLogger(ctx).WithField("class", "CryptoController").WithField("method", "getIdTokenFromContext")
+
 	if jwtToken == "" {
-		logging.GetLogger(ctx).Error("CryptoController.EncryptIdToken: Cannot find idToken")
+		logger.Error("Cannot find idToken")
 		return model.IdToken{}, errors.New("no token found")
 	}
 	idToken, decodingError := cryptoController.cryptoUtil.DecodeJwtToken(jwtToken)
 	if decodingError != nil {
-		logging.GetLogger(ctx).Error("CryptoController.EncryptIdToken: Error in decoding jwtToken")
+		logger.Error("Error in decoding jwtToken")
 		return model.IdToken{}, errors.New("invalid token format")
 	}
 	return idToken, nil
 }
 
 func (cryptoController cryptoController) handleBadRequestError(bindError error, ctx *gin.Context) {
-	logging.GetLogger(ctx).Error("CryptoController: Bad Request Error: ", bindError.Error())
+	logging.GetLogger(ctx).WithField("class", "CryptoController").WithField("method", "handleBadRequestError").
+		Error("Bad Request Error: ", bindError.Error())
 	ctx.AbortWithStatusJSON(http.StatusBadRequest, constants.PayloadValidationError)
 }
