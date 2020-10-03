@@ -6,11 +6,13 @@ package mocks
 
 import (
 	context "context"
+	constants "crypto-service/constants"
 	rsa "crypto/rsa"
 	gin "github.com/gin-gonic/gin"
 	golaerror "github.com/gola-glitch/gola-utils/golaerror"
 	model "github.com/gola-glitch/gola-utils/model"
 	gomock "github.com/golang/mock/gomock"
+	go_jose_v2 "gopkg.in/square/go-jose.v2"
 	reflect "reflect"
 )
 
@@ -67,6 +69,21 @@ func (mr *MockCryptoUtilMockRecorder) Decrypt(key, encryptedText, ctx interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decrypt", reflect.TypeOf((*MockCryptoUtil)(nil).Decrypt), key, encryptedText, ctx)
 }
 
+// GetEncrypter mocks base method
+func (m *MockCryptoUtil) GetEncrypter(ctx *gin.Context, publicKey *rsa.PublicKey) (go_jose_v2.Encrypter, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEncrypter", ctx, publicKey)
+	ret0, _ := ret[0].(go_jose_v2.Encrypter)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetEncrypter indicates an expected call of GetEncrypter
+func (mr *MockCryptoUtilMockRecorder) GetEncrypter(ctx, publicKey interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEncrypter", reflect.TypeOf((*MockCryptoUtil)(nil).GetEncrypter), ctx, publicKey)
+}
+
 // GetPrivateKey mocks base method
 func (m *MockCryptoUtil) GetPrivateKey(ctx *gin.Context, key string) (*rsa.PrivateKey, error) {
 	m.ctrl.T.Helper()
@@ -80,6 +97,21 @@ func (m *MockCryptoUtil) GetPrivateKey(ctx *gin.Context, key string) (*rsa.Priva
 func (mr *MockCryptoUtilMockRecorder) GetPrivateKey(ctx, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPrivateKey", reflect.TypeOf((*MockCryptoUtil)(nil).GetPrivateKey), ctx, key)
+}
+
+// GetPublicKey mocks base method
+func (m *MockCryptoUtil) GetPublicKey(ctx *gin.Context, key string, keyType constants.PublicKeyType) (*rsa.PublicKey, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPublicKey", ctx, key, keyType)
+	ret0, _ := ret[0].(*rsa.PublicKey)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPublicKey indicates an expected call of GetPublicKey
+func (mr *MockCryptoUtilMockRecorder) GetPublicKey(ctx, key, keyType interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPublicKey", reflect.TypeOf((*MockCryptoUtil)(nil).GetPublicKey), ctx, key, keyType)
 }
 
 // EncodePayloadToJWTToken mocks base method
