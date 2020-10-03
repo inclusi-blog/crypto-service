@@ -26,13 +26,16 @@ func TestCryptoUtilTestSuite(t *testing.T) {
 }
 
 func (suite *CryptoUtilTestSuite) SetupSuite() {
-	passwordPrivateKey, _ := ioutil.ReadFile(constants.PASSWORD_PRIVATE_KEY_FILE)
-	privateKey, _ := ioutil.ReadFile(constants.PRIVATE_FILE)
 	publicKey, _ := ioutil.ReadFile(constants.PUBLIC_FILE)
+	privateKey, _ := ioutil.ReadFile(constants.PRIVATE_FILE)
+	passwordPrivateKey, _ := ioutil.ReadFile(constants.PASSWORD_PRIVATE_KEY_FILE)
+	passwordPublicKey, _ := ioutil.ReadFile(constants.PASSWORD_PUBLIC_KEY_FILE)
 	suite.context, _ = gin.CreateTestContext(httptest.NewRecorder())
 	suite.context.Request, _ = http.NewRequest("GET", "dummyUrl", nil)
 	err := os.Setenv(constants.PASSWORD_PRIVATE_KEY, string(passwordPrivateKey))
 	suite.Nil(err)
+	_ = os.Setenv("SOME_RSA_KEY", string(passwordPublicKey))
+	_ = os.Setenv("SOME_RSA_KEY_WITH_INVALID_VALUE", "invalid key will error")
 	err = os.Setenv(constants.PRIVATE_KEY, string(privateKey))
 	suite.Nil(err)
 	err = os.Setenv(constants.PUBLIC_KEY, string(publicKey))
@@ -115,4 +118,38 @@ func (suite CryptoUtilTestSuite) TestShouldReturnErrorForValidFormatButNotBase64
 	_, err := suite.cryptoUtil.DecodeJwtToken(jwtToken)
 	expectedError := base64.CorruptInputError(1)
 	suite.Equal(expectedError, err)
+}
+
+func (suite CryptoUtilTestSuite) TestShouldReturnPublicKeyForCorrectFilePathAndPKCS1Type() {
+	_, err := suite.cryptoUtil.GetPublicKey(suite.context, constants.PUBLIC_KEY, constants.PKIXPublicKey)
+	suite.Nil(err)
+}
+
+func (suite CryptoUtilTestSuite) TestShouldThrowErrorForInvalidKeyType() {
+	_, err := suite.cryptoUtil.GetPublicKey(suite.context, constants.PUBLIC_KEY, "loltype")
+	suite.Error(err)
+	suite.Equal("invalid key type provided", err.Error())
+}
+
+func (suite CryptoUtilTestSuite) TestShouldReturnPublicKeyForCorrectFilePathAndPKIXType() {
+	_, err := suite.cryptoUtil.GetPublicKey(suite.context, "SOME_RSA_KEY", constants.PKIXPublicKey)
+	suite.Nil(err)
+}
+
+func (suite CryptoUtilTestSuite) TestShouldThrowErrorForInvalidKeyId() {
+	_, err := suite.cryptoUtil.GetPublicKey(suite.context, "SOME_INVALID_KEY", constants.PKIXPublicKey)
+	suite.Error(err)
+	suite.Equal("no env variable found", err.Error())
+}
+
+func (suite CryptoUtilTestSuite) TestShouldThrowErrorWhenKeyIsNotPem() {
+	_, err := suite.cryptoUtil.GetPublicKey(suite.context, "SOME_RSA_KEY_WITH_INVALID_VALUE", constants.PKIXPublicKey)
+	suite.Error(err)
+	suite.Equal("public key not found", err.Error())
+
+}
+
+func (suite CryptoUtilTestSuite) TestShouldThrowErrorWhenKeyIsOfInvalidFormat() {
+	_, err := suite.cryptoUtil.GetPublicKey(suite.context, "SOME_RSA_KEY", constants.PKCS1PublicKey)
+	suite.Error(err)
 }

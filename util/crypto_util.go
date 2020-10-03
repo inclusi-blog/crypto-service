@@ -26,6 +26,7 @@ type CryptoUtil interface {
 	DecodeJwtToken(jwtToken string) (model.IdToken, error)
 	Decrypt(key *rsa.PrivateKey, encryptedText string, ctx context.Context) (string, *golaerror.Error)
 	GetPrivateKey(ctx *gin.Context, key string) (*rsa.PrivateKey, error)
+	GetPublicKey(ctx *gin.Context, key string, keyType constants.PublicKeyType) (*rsa.PublicKey, error)
 	EncodePayloadToJWTToken(payload string, key *rsa.PrivateKey) (string, error)
 }
 
@@ -113,6 +114,42 @@ func (utils cryptoUtil) DecodeJwtToken(jwtToken string) (model.IdToken, error) {
 		return model.IdToken{}, unmarshalError
 	}
 	return token, nil
+}
+
+func (utils cryptoUtil) GetPublicKey(ctx *gin.Context, key string, keyType constants.PublicKeyType) (*rsa.PublicKey, error) {
+	logger := logging.GetLogger(ctx)
+
+	fileData, fileError := getKeyData(key)
+	if fileError != nil {
+		logger.Error("Error in reading public key")
+		return nil, fileError
+	}
+
+	data, _ := pem.Decode(fileData)
+	if data == nil {
+		logger.Error("Public key not found.")
+		return nil, errors.New("public key not found")
+	}
+	var publicKey *rsa.PublicKey
+	var parsingError error
+
+	switch keyType {
+	case constants.PKCS1PublicKey:
+		publicKey, parsingError = x509.ParsePKCS1PublicKey(data.Bytes)
+	case constants.PKIXPublicKey:
+		var genericPubkey interface{}
+		genericPubkey, parsingError = x509.ParsePKIXPublicKey(data.Bytes)
+		publicKey = genericPubkey.(*rsa.PublicKey)
+	default:
+		logger.Error("CryptoUtil: Invalid key type provided")
+		return nil, errors.New("invalid key type provided")
+	}
+	if parsingError != nil {
+		logger.Error("Error in parsing a public key")
+		return nil, parsingError
+	}
+
+	return publicKey, nil
 }
 
 func getKeyData(keyName string) ([]byte, error) {
