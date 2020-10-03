@@ -9,6 +9,7 @@ import (
 	rsa "crypto/rsa"
 	gin "github.com/gin-gonic/gin"
 	golaerror "github.com/gola-glitch/gola-utils/golaerror"
+	model "github.com/gola-glitch/gola-utils/model"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -34,6 +35,21 @@ func NewMockCryptoUtil(ctrl *gomock.Controller) *MockCryptoUtil {
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockCryptoUtil) EXPECT() *MockCryptoUtilMockRecorder {
 	return m.recorder
+}
+
+// DecodeJwtToken mocks base method
+func (m *MockCryptoUtil) DecodeJwtToken(jwtToken string) (model.IdToken, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DecodeJwtToken", jwtToken)
+	ret0, _ := ret[0].(model.IdToken)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DecodeJwtToken indicates an expected call of DecodeJwtToken
+func (mr *MockCryptoUtilMockRecorder) DecodeJwtToken(jwtToken interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecodeJwtToken", reflect.TypeOf((*MockCryptoUtil)(nil).DecodeJwtToken), jwtToken)
 }
 
 // Decrypt mocks base method
@@ -64,4 +80,19 @@ func (m *MockCryptoUtil) GetPrivateKey(ctx *gin.Context, key string) (*rsa.Priva
 func (mr *MockCryptoUtilMockRecorder) GetPrivateKey(ctx, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPrivateKey", reflect.TypeOf((*MockCryptoUtil)(nil).GetPrivateKey), ctx, key)
+}
+
+// EncodePayloadToJWTToken mocks base method
+func (m *MockCryptoUtil) EncodePayloadToJWTToken(payload string, key *rsa.PrivateKey) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EncodePayloadToJWTToken", payload, key)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// EncodePayloadToJWTToken indicates an expected call of EncodePayloadToJWTToken
+func (mr *MockCryptoUtilMockRecorder) EncodePayloadToJWTToken(payload, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncodePayloadToJWTToken", reflect.TypeOf((*MockCryptoUtil)(nil).EncodePayloadToJWTToken), payload, key)
 }
