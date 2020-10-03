@@ -12,8 +12,8 @@
       "encoding_type": "RSA"
     },
     "IDP_KEY": {
-      "env_name": "CRYPTO_SCV_PUBLIC_KEY",
-      "encoding_type": "ASN"
+      "env_name": "CRYPTO_SVC_PUBLIC_KEY",
+      "encoding_type": "RSA"
     }
   }
 }
