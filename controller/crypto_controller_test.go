@@ -7,7 +7,9 @@ import (
 	"crypto-service/models/request"
 	"crypto-service/models/response"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/gola-glitch/gola-utils/model"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
@@ -84,6 +86,76 @@ func (suite CryptoControllerTestSuite) TestShouldReturnBadRequestErrorWhenDecode
 
 	suite.cryptoService.EXPECT().Decrypt(suite.context, "hello").Return(response.DecryptResponse{}, &constants.DecodeError)
 	suite.cryptoController.Decrypt(suite.context)
+
+	suite.Equal(http.StatusBadRequest, suite.recorder.Code)
+}
+
+func (suite CryptoControllerTestSuite) TestEncryptIdTokenShouldReturnJWEWhenValidJWTisProvided() {
+	suite.context.Request, _ = http.NewRequest("GET", "/", nil)
+	suite.context.Request.AddCookie(&http.Cookie{
+		Name:  "id_token",
+		Value: "JWT",
+	})
+	jweResponse := response.JWEResponse{
+		JWEToken: "JWE",
+	}
+	idToken := model.IdToken{
+		UserId:     "userid",
+	}
+	jweRequest := request.JWERequest{
+		PublicKeyId: constants.IDP_PUBLIC_KEY_ID,
+		Payload:     idToken,
+	}
+	suite.cryptoUtil.EXPECT().DecodeJwtToken("JWT").Return(idToken, nil)
+	suite.cryptoService.EXPECT().EncryptPayloadToJWE(suite.context, jweRequest).Return(jweResponse, nil)
+
+	suite.cryptoController.EncryptIdToken(suite.context)
+
+	suite.Equal(http.StatusOK, suite.recorder.Code)
+	respCookies := suite.recorder.Result().Cookies()
+	suite.Equal(1, len(respCookies))
+	suite.Equal("enc_id_token", respCookies[0].Name)
+	suite.Equal("JWE", respCookies[0].Value)
+}
+
+func (suite CryptoControllerTestSuite) TestEncryptIdTokenShouldReturnBadRequestWhenJWTisNotProvided() {
+	suite.context.Request, _ = http.NewRequest("GET", "/", nil)
+
+	suite.cryptoController.EncryptIdToken(suite.context)
+
+	suite.Equal(http.StatusBadRequest, suite.recorder.Code)
+}
+
+func (suite CryptoControllerTestSuite) TestEncryptIdTokenShouldReturnBadRequestWhenInvalidJWTisProvided() {
+	suite.context.Request, _ = http.NewRequest("GET", "/", nil)
+	suite.context.Request.AddCookie(&http.Cookie{
+		Name:  "id_token",
+		Value: "JWT",
+	})
+	suite.cryptoUtil.EXPECT().DecodeJwtToken("JWT").Return(model.IdToken{}, errors.New("invalid jwt token"))
+
+	suite.cryptoController.EncryptIdToken(suite.context)
+
+	suite.Equal(http.StatusBadRequest, suite.recorder.Code)
+}
+
+func (suite CryptoControllerTestSuite) TestEncryptIdTokenShouldThrowErrorWhenSomethingWentWrongInService() {
+	suite.context.Request, _ = http.NewRequest("GET", "/", nil)
+	suite.context.Request.AddCookie(&http.Cookie{
+		Name:  "id_token",
+		Value: "JWT",
+	})
+	idToken := model.IdToken{
+		UserId:     "userid",
+	}
+	jweRequest := request.JWERequest{
+		PublicKeyId: constants.IDP_PUBLIC_KEY_ID,
+		Payload:     idToken,
+	}
+	suite.cryptoUtil.EXPECT().DecodeJwtToken("JWT").Return(idToken, nil)
+	suite.cryptoService.EXPECT().EncryptPayloadToJWE(suite.context, jweRequest).Return(response.JWEResponse{}, &constants.PayloadValidationError)
+
+	suite.cryptoController.EncryptIdToken(suite.context)
 
 	suite.Equal(http.StatusBadRequest, suite.recorder.Code)
 }

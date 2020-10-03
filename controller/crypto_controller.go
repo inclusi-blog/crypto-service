@@ -5,15 +5,19 @@ import (
 	"crypto-service/models/request"
 	"crypto-service/service"
 	"crypto-service/util"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/gola-glitch/gola-utils/golaerror"
 	"github.com/gola-glitch/gola-utils/logging"
+	"github.com/gola-glitch/gola-utils/model"
 	"net/http"
+	"net/url"
 )
 
 type CryptoController interface {
 	Decrypt(c *gin.Context)
+	EncryptIdToken(ctx *gin.Context)
 }
 
 type cryptoController struct {
@@ -54,6 +58,56 @@ func (cryptoController cryptoController) Decrypt(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, decryptResponse)
+}
+
+// EncryptIdToken godoc
+// @Tags IDToken Utility
+// @Summary Encrypt id token
+// @Description This API will take id token from cookies and returns back the encrypted id token in cookie
+// @Accept  json
+// @Produce  json
+// @Success 200 ""
+// @Failure 400 ""
+// @Router /api/crypto/id-token/encrypt [get]
+func (cryptoController cryptoController) EncryptIdToken(ctx *gin.Context) {
+	idToken, idTokenError := cryptoController.getIdTokenFromContext(ctx)
+	if idTokenError != nil {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	jweRequest := request.JWERequest{
+		PublicKeyId: constants.IDP_PUBLIC_KEY_ID,
+		Payload:     idToken,
+	}
+	encryptedIdToken, inValidJWTError := cryptoController.cryptoService.EncryptPayloadToJWE(ctx, jweRequest)
+	if inValidJWTError != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, inValidJWTError)
+		return
+	}
+
+	http.SetCookie(ctx.Writer, createCookie("enc_id_token", encryptedIdToken.JWEToken))
+	ctx.String(http.StatusOK, "")
+}
+
+func createCookie(name string, value string) *http.Cookie {
+	return &http.Cookie{
+		Name:  name,
+		Value: url.QueryEscape(value),
+	}
+}
+
+func (cryptoController cryptoController) getIdTokenFromContext(ctx *gin.Context) (model.IdToken, error) {
+	jwtToken, _ := ctx.Cookie("id_token")
+	if jwtToken == "" {
+		logging.GetLogger(ctx).Error("CryptoController.EncryptIdToken: Cannot find idToken")
+		return model.IdToken{}, errors.New("no token found")
+	}
+	idToken, decodingError := cryptoController.cryptoUtil.DecodeJwtToken(jwtToken)
+	if decodingError != nil {
+		logging.GetLogger(ctx).Error("CryptoController.EncryptIdToken: Error in decoding jwtToken")
+		return model.IdToken{}, errors.New("invalid token format")
+	}
+	return idToken, nil
 }
 
 func (cryptoController cryptoController) handleBadRequestError(bindError error, ctx *gin.Context) {

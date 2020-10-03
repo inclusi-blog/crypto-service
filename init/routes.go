@@ -41,5 +41,6 @@ func RegisterRouter(router *gin.Engine, configData *configuration.ConfigData) {
 	{
 		routerGroup.GET("api/crypto/healthz", healthController.GetHealth)
 		routerGroup.POST("/crypto/decrypt", cryptoController.Decrypt)
+		routerGroup.GET("/crypto/id-token/encrypt", cryptoController.EncryptIdToken)
 	}
 }
