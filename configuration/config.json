@@ -5,5 +5,15 @@
     "maxOpenConnections": 0,
     "maxIdleConnections": 0,
     "maxConnectionLifetimeMinutes": 0
+  },
+  "publickey_mapping": {
+    "TETHERFI_KEY": {
+      "env_name": "TETHERFI_PUBLIC_KEY",
+      "encoding_type": "RSA"
+    },
+    "IDP_KEY": {
+      "env_name": "CRYPTO_SCV_PUBLIC_KEY",
+      "encoding_type": "ASN"
+    }
   }
 }

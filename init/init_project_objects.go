@@ -14,6 +14,7 @@ var (
 
 func Objects(configData *configuration.ConfigData) {
 	cryptoUtil := util.NewCryptoUtil()
-	cryptoService := service.NewCryptoService(cryptoUtil)
+	mappingConfiguration := configuration.NewPublickeyMappingConfiguration(configData.PublicKeyMap)
+	cryptoService := service.NewCryptoService(cryptoUtil, mappingConfiguration)
 	cryptoController = controller.NewCryptoController(cryptoService, cryptoUtil)
 }

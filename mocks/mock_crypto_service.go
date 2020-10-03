@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	request "crypto-service/models/request"
 	response "crypto-service/models/response"
 	gin "github.com/gin-gonic/gin"
 	golaerror "github.com/gola-glitch/gola-utils/golaerror"
@@ -35,6 +36,21 @@ func (m *MockCryptoService) EXPECT() *MockCryptoServiceMockRecorder {
 	return m.recorder
 }
 
+// DecryptJWE mocks base method
+func (m *MockCryptoService) DecryptJWE(ctx *gin.Context, request string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DecryptJWE", ctx, request)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DecryptJWE indicates an expected call of DecryptJWE
+func (mr *MockCryptoServiceMockRecorder) DecryptJWE(ctx, request interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DecryptJWE", reflect.TypeOf((*MockCryptoService)(nil).DecryptJWE), ctx, request)
+}
+
 // Decrypt mocks base method
 func (m *MockCryptoService) Decrypt(ctx *gin.Context, request string) (response.DecryptResponse, *golaerror.Error) {
 	m.ctrl.T.Helper()
@@ -48,4 +64,19 @@ func (m *MockCryptoService) Decrypt(ctx *gin.Context, request string) (response.
 func (mr *MockCryptoServiceMockRecorder) Decrypt(ctx, request interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Decrypt", reflect.TypeOf((*MockCryptoService)(nil).Decrypt), ctx, request)
+}
+
+// EncryptPayloadToJWE mocks base method
+func (m *MockCryptoService) EncryptPayloadToJWE(ctx *gin.Context, request request.JWERequest) (response.JWEResponse, *golaerror.Error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EncryptPayloadToJWE", ctx, request)
+	ret0, _ := ret[0].(response.JWEResponse)
+	ret1, _ := ret[1].(*golaerror.Error)
+	return ret0, ret1
+}
+
+// EncryptPayloadToJWE indicates an expected call of EncryptPayloadToJWE
+func (mr *MockCryptoServiceMockRecorder) EncryptPayloadToJWE(ctx, request interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncryptPayloadToJWE", reflect.TypeOf((*MockCryptoService)(nil).EncryptPayloadToJWE), ctx, request)
 }
