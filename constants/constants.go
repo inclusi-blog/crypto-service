@@ -9,6 +9,7 @@ const (
 	PUBLIC_KEY                = "CRYPTO_SVC_PUBLIC_KEY"
 	PRIVATE_FILE              = "./resources/private_key.pem"
 	PRIVATE_KEY               = "CRYPTO_SVC_PRIVATE_KEY"
+	IDP_PUBLIC_KEY_ID         = "IDP_KEY"
 )
 
 type PublicKeyType string
