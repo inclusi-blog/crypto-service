@@ -24,11 +24,11 @@ import (
 
 type CryptoUtil interface {
 	DecodeJwtToken(jwtToken string) (model.IdToken, error)
-	Decrypt(key *rsa.PrivateKey, encryptedText string, ctx context.Context) (string, *golaerror.Error)
+	GetPublicKey(ctx *gin.Context, key string, keyType constants.PublicKeyType) (*rsa.PublicKey, error)
 	GetEncryptor(ctx *gin.Context, publicKey *rsa.PublicKey) (goJoseV2.Encrypter, error)
 	GetPrivateKey(ctx *gin.Context, key string) (*rsa.PrivateKey, error)
-	GetPublicKey(ctx *gin.Context, key string, keyType constants.PublicKeyType) (*rsa.PublicKey, error)
 	EncodePayloadToJWTToken(payload string, key *rsa.PrivateKey) (string, error)
+	Decrypt(key *rsa.PrivateKey, encryptedText string, ctx context.Context) (string, *golaerror.Error)
 }
 
 func NewCryptoUtil() CryptoUtil {

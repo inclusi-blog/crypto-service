@@ -15,5 +15,15 @@
       "env_name": "CRYPTO_SVC_PUBLIC_KEY",
       "encoding_type": "RSA"
     }
+  },
+  "privatekey_mapping": {
+    "PASSWORD_KEY": {
+      "env_name": "PASSWORD_PRIVATE_KEY",
+      "encoding_type": "RSA"
+    },
+    "JWE_KEY": {
+      "env_name": "CRYPTO_SVC_PRIVATE_KEY",
+      "encoding_type": "RSA"
+    }
   }
 }

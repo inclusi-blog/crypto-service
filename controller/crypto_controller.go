@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/gola-glitch/gola-utils/golaerror"
+	golaUtil "github.com/gola-glitch/gola-utils/http/util"
 	"github.com/gola-glitch/gola-utils/logging"
 	"github.com/gola-glitch/gola-utils/model"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 type CryptoController interface {
 	Decrypt(c *gin.Context)
 	EncryptIdToken(ctx *gin.Context)
+	DecryptIdToken(ctx *gin.Context)
 }
 
 type cryptoController struct {
@@ -92,6 +94,39 @@ func (cryptoController cryptoController) EncryptIdToken(ctx *gin.Context) {
 	logger.Info("setting encrypted id token in cookie")
 
 	http.SetCookie(ctx.Writer, createCookie("enc_id_token", encryptedIdToken.JWEToken))
+	ctx.String(http.StatusOK, "")
+}
+
+// DecryptIdToken godoc
+// @Tags IDToken Utility
+// @Summary Decrypt id token
+// @Description This API will take encrypted id token from cookies and returns back the decrypted id token in cookie
+// @Accept  json
+// @Produce  json
+// @Success 200 ""
+// @Failure 400 ""
+// @Router /api/crypto/id-token/decrypt [get]
+func (cryptoController cryptoController) DecryptIdToken(ctx *gin.Context) {
+	logger := logging.GetLogger(ctx).WithField("class", "CryptoController").WithField("method", "DecryptIdToken")
+
+	logger.Info("Fetching encrypted id token from request.")
+	encryptedIdToken, err := golaUtil.GetEncryptedIDToken(ctx)
+
+	if encryptedIdToken == "" || err != nil {
+		logger.Errorf("Error when Fetching encrypted id token from request. Error: %v", err)
+		ctx.AbortWithStatus(http.StatusBadRequest) //TODO: Use error response interceptor
+		return
+	}
+
+	decryptionResponse, decryptJweError := cryptoController.cryptoService.DecryptJWE(ctx, encryptedIdToken)
+	if decryptJweError != nil {
+		logger.Errorf("Error when Decrypt JWE token. Error: %-v", decryptJweError)
+		constants.RespondWithGolaError(ctx, decryptJweError)
+		return
+	}
+
+	http.SetCookie(ctx.Writer, createCookie("id_token", decryptionResponse))
+	logger.Info("Successfully decrypt the encrypted id token and set it in the response cookie")
 	ctx.String(http.StatusOK, "")
 }
 

@@ -159,3 +159,60 @@ func (suite CryptoControllerTestSuite) TestEncryptIdTokenShouldThrowErrorWhenSom
 
 	suite.Equal(http.StatusBadRequest, suite.recorder.Code)
 }
+
+func (suite CryptoControllerTestSuite) TestDecryptIdToken_WhenEncryptedIDTokenSentInHeader() {
+	suite.cryptoService.EXPECT().DecryptJWE(suite.context, "some-value").Return("some-decrypted-value", nil).Times(1)
+
+	suite.context.Request, _ = http.NewRequest(http.MethodGet, "crypto/id-token/decrypt", nil)
+
+	suite.context.Request.Header.Add("enc-id-token", "some-value")
+	suite.cryptoController.DecryptIdToken(suite.context)
+
+	cookies := suite.recorder.Result().Cookies()
+
+	suite.Equal(http.StatusOK, suite.recorder.Code)
+	suite.Len(cookies, 1)
+	suite.Equal("id_token" , cookies[0].Name)
+	suite.Equal("some-decrypted-value" , cookies[0].Value)
+}
+
+func (suite CryptoControllerTestSuite) TestDecryptIdToken_WhenEncryptedIDTokenSentInCookies() {
+	suite.cryptoService.EXPECT().DecryptJWE(suite.context, "some-value").Return("some-decrypted-value", nil).Times(1)
+
+	suite.context.Request, _ = http.NewRequest(http.MethodGet, "crypto/id-token/decrypt", nil)
+	cookie := http.Cookie{
+		Name:  "enc_id_token",
+		Value: "some-value",
+	}
+	suite.context.Request.AddCookie(&cookie)
+	suite.cryptoController.DecryptIdToken(suite.context)
+
+	cookies := suite.recorder.Result().Cookies()
+
+	suite.Equal(http.StatusOK, suite.recorder.Code)
+	suite.Len(cookies, 1)
+	suite.Equal("id_token" , cookies[0].Name)
+	suite.Equal("some-decrypted-value" , cookies[0].Value)
+}
+
+func (suite CryptoControllerTestSuite) TestDecryptIdToken_WhenEncryptedIDTokenNotSent() {
+	suite.context.Request, _ = http.NewRequest(http.MethodGet, "crypto/id-token/decrypt", nil)
+	suite.cryptoController.DecryptIdToken(suite.context)
+
+	suite.Equal(http.StatusBadRequest, suite.recorder.Code)
+}
+
+func (suite CryptoControllerTestSuite) TestDecryptIdToken_WhenDecryptServiceFails() {
+	suite.cryptoService.EXPECT().DecryptJWE(suite.context, "some-value").Return("", &constants.DecryptionError).Times(1)
+
+	suite.context.Request, _ = http.NewRequest(http.MethodGet, "crypto/id-token/decrypt", nil)
+	cookie := http.Cookie{
+		Name:  "enc_id_token",
+		Value: "some-value",
+	}
+	suite.context.Request.AddCookie(&cookie)
+	suite.cryptoController.DecryptIdToken(suite.context)
+	marshal, _ := json.Marshal(constants.DecryptionError)
+	suite.Equal(http.StatusInternalServerError, suite.recorder.Code)
+	suite.Equal(string(marshal), suite.recorder.Body.String())
+}
