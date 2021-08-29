@@ -6,7 +6,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
-	github.com/gola-glitch/gola-utils v0.0.0-20201003113415-c58a85a2a324
+	github.com/gola-glitch/gola-utils v0.0.0-20210829163106-9f47a25a9aff
 	github.com/golang/mock v1.4.3
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/stretchr/testify v1.4.0

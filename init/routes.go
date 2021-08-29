@@ -13,13 +13,7 @@ import (
 
 func RegisterRouter(router *gin.Engine, configData *configuration.ConfigData) {
 	router.Use(middleware.SessionTracingMiddleware)
-	router.Use(request_response_trace.HttpRequestResponseTracingMiddleware([]request_response_trace.IgnoreRequestResponseLogs{
-		{
-			PartialApiPath:       "api/crypto/healthz",
-			IsRequestLogAllowed:  false,
-			IsResponseLogAllowed: false,
-		},
-	}))
+	router.Use(request_response_trace.HttpRequestResponseTracingAllMiddlewareWithCustomHealthEndpoint("api/post/healthz"))
 
 	golaLoggerRegistry := logging.NewLoggerEntry()
 
