@@ -2,7 +2,7 @@ WORK_DIR = $(shell pwd)
 
 PROJECT := crypto-service
 
-BUILD_VENDOR := git config --global url."https://gola-glitch:2f139c1997392434c4acfd282d8d91d70325ac8f@github.com".insteadOf "https://github.com" && \
+BUILD_VENDOR := git config --global url."https://gola-glitch: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@github.com".insteadOf "https://github.com" && \
                 go env -w GOPRIVATE=github.com/gola-glitch && go mod vendor && chmod -R +w vendor
 
 docker_login:
@@ -16,6 +16,12 @@ build: install_deps
 	docker-compose -f infrastructure/build.yml --project-name $(PROJECT) \
 	run --rm build-env /bin/sh -c "go build -mod=vendor -o ./bin/crypto-service"
 
+start: build
+	docker-compose -f docker-compose.local-app.yml --project-name $(PROJECT) up -d
+
+stop:
+	docker-compose -f docker-compose.local-app.yml --project-name $(PROJECT) down -v
+
 safesql: install_deps
 	docker-compose -f infrastructure/build.yml --project-name $(PROJECT) \
 	run --rm build-env /bin/sh -c "go get github.com/stripe/safesql && safesql main.go"
@@ -23,9 +29,6 @@ safesql: install_deps
 vet: install_deps
 	docker-compose -f infrastructure/build.yml --project-name $(PROJECT) \
 	run --rm build-env /bin/sh -c "go vet -mod=vendor ./..."
-
-start: build
-	docker-compose -f docker-compose.local-app.yml up -d
 
 clean:
 	chmod -R +w ./.gopath vendor || true

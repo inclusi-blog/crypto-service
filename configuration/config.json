@@ -1,5 +1,6 @@
 {
   "tracing_service_name": "CRYPTO-SERVICE",
+  "environment": "local",
   "tracing_oc_agent_host": "localhost:55678",
   "dbConnectionPool": {
     "maxOpenConnections": 0,

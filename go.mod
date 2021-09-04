@@ -9,6 +9,7 @@ require (
 	github.com/gola-glitch/gola-utils v0.0.0-20210829163106-9f47a25a9aff
 	github.com/golang/mock v1.4.3
 	github.com/google/go-cmp v0.5.2 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/stretchr/testify v1.4.0
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.2.0
