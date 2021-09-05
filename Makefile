@@ -1,6 +1,7 @@
 WORK_DIR = $(shell pwd)
 
 PROJECT := crypto-service
+REVISION := latest
 
 BUILD_VENDOR := git config --global url."https://gola-glitch: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@github.com".insteadOf "https://github.com" && \
                 go env -w GOPRIVATE=github.com/gola-glitch && go mod vendor && chmod -R +w vendor
@@ -32,6 +33,10 @@ vet: install_deps
 
 clean:
 	chmod -R +w ./.gopath vendor || true
+
+publish: docker_login
+	docker tag cryto-svc $(ARTIFACTORY_USER)/crypto-svc:$(REVISION); \
+	docker push $(ARTIFACTORY_USER)/crypto-svc:$(REVISION);
 
 pre_commit:
 	go mod tidy
