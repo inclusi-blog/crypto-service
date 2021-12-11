@@ -20,6 +20,9 @@ build: install_deps
 start: build
 	docker-compose -f docker-compose.local-app.yml --project-name $(PROJECT) up -d
 
+dockerize: docker_login
+	docker-compose -f docker-compose.local-app.yml build --no-cache
+
 stop:
 	docker-compose -f docker-compose.local-app.yml --project-name $(PROJECT) down -v
 

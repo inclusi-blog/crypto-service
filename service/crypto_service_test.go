@@ -9,11 +9,14 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gola-glitch/gola-utils/model"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/square/go-jose.v2"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -239,4 +242,29 @@ func (suite CryptoServiceTestSuite) TestShouldReturnJWEWhenValidJWTisProvided() 
 	actualJWE, _ := suite.cryptoService.EncryptPayloadToJWE(suite.context, jweRequest)
 
 	suite.Equal(5, len(strings.Split(actualJWE.JWEToken, ".")))
+}
+
+func (suite *CryptoServiceTestSuite) TestNoContentWithSomeData() {
+	router := gin.Default()
+	server := httptest.NewServer(router)
+	router.GET("/hello", func(context *gin.Context) {
+		context.JSON(http.StatusNoContent, gin.H{
+			"status": "success",
+		})
+	})
+
+	newRequest, _ := http.NewRequest(http.MethodGet, server.URL+"/hello", nil)
+	response, err := http.DefaultClient.Do(newRequest)
+	if err != nil {
+		fmt.Printf("error %v", err)
+	}
+	bytes, err := ioutil.ReadAll(response.Body)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), 204, response.StatusCode)
+	expected := map[string]interface{}{
+		"status": "success",
+	}
+	expectedBytes, err := json.Marshal(expected)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), string(expectedBytes), string(bytes))
 }
