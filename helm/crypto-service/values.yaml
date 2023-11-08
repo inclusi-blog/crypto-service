@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: gola05/crypto-svc
   version: "latest"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 imagePullSecrets:
   - name: artifactory-registry
