@@ -41,4 +41,3 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- define "gola-api.configpath" -}}
 {{- printf "configuration/dev/**" -}}
 {{- end -}}
-{{- end -}}
