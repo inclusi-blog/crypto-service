@@ -16,7 +16,7 @@ spec:
         http:
           paths:
             - path: {{ $values.ingress.path }}
-              pathType: Prefixx
+              pathType: Prefix
               backend:
                 service:
                   name: {{ $apiName }}-svc
