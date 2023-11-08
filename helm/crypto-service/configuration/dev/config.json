@@ -1,0 +1,18 @@
+{
+  "environment": "DEV",
+  "log_level": "DEBUG",
+  "open_tracing_agent": "oc-collector.tracing:55678",
+  "allowed_origins": [
+    "https://app.experimental-opt.idfcbank.com"
+  ],
+  "publickey_mapping": {
+    "TETHERFI_KEY": {
+      "env_name": "TETHERFI_PUBLIC_KEY",
+      "encoding_type": "RSA"
+    },
+    "IDP_KEY": {
+      "env_name": "CRYPTO_SVC_PUBLIC_KEY",
+      "encoding_type": "ASN"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+# Default values for bas-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: gola05/crypto-svc
+  version: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: artifactory-registry
+
+service:
+  port: 8080
+  targetPort: 8080
+
+resources:
+  requests:
+    memory: "500Mi"
+    cpu: "500m"
+  limits:
+    memory: "500Mi"
+    cpu: "500m"
+
+pdb:
+  minAvailable: 1
+
+hpa:
+  minReplicas: 1
+  maxReplicas: 2
+  averageValue: 4
+
+annotations:
+  linkerd: enabled
+  reloader:
+    enabled: true
+    configmap: true
+    secret: true
+  metrics:
+    enablePrometheusScraping: false
+
+configMountPath: "/configuration/config.json"
+
+ingress:
+  path: "/api/crypto"
+  allowCryptoServicePath: true
+  appTLSSecret: "narratenet-tls"
+  appFqdns:
+    - "api.narratenet.com"
+
+livenessProbe:
+  httpGet:
+    path: "/api/crypto/healthz"
+
+readinessProbe:
+  httpGet:
+    path: "/api/crypto/healthz"
+
+vpa:
+  enabled: true
+
+token:
+  public_key: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZk1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTkFEQ0JpUUtCZ1FDM0ZJbzBndXNzVWZGblM3dndwc3M5QlBETgpjejNkYjU0K1AyZTBYOVF2VUZ2VWlPMDVFdUs1YURUQTZoeWFJcDhESkhERVlqV2dmSWZsb2c3RFhZVlp5d0d3CmYrQnRtOFJzMmJtWGluQU50QlZ6Ri9lSWZQRkNCcy9hVlBQWjBWYTV3ZWc5c2dmN1o1Vlc1TmRBZjBjUkQ0TVkKNnFOREI3N1VpOGRlM2U2NkhRSURBUUFCCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo="
+  private_key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlDWEFJQkFBS0JnUUMzRklvMGd1c3NVZkZuUzd2d3BzczlCUEROY3ozZGI1NCtQMmUwWDlRdlVGdlVpTzA1CkV1SzVhRFRBNmh5YUlwOERKSERFWWpXZ2ZJZmxvZzdEWFlWWnl3R3dmK0J0bThSczJibVhpbkFOdEJWekYvZUkKZlBGQ0JzL2FWUFBaMFZhNXdlZzlzZ2Y3WjVWVzVOZEFmMGNSRDRNWTZxTkRCNzdVaThkZTNlNjZIUUlEQVFBQgpBb0dCQUpNZENDbEdBaCt0QU9SV01RRWhwakswSTZPVHRPU1k2bmx1amJDZFNHMTBqelhyaVdQUlR5cFpGL3JrCnBITWUydE8xbG4vWHd1dmc1WHFhakc1a1dkLzlWd1BxY3VTZGVkYjQxNCt2WlllWkRFSjlNTUQzL3VuZ01Ic24KUGRUbHNQbVdZdlZpUUEvQ0lwVERjVUFZYU4renBFYlZJZ1hHeExHWi9UZlFTNWZCQWtFQThwdkdOelc2cG9JVQpNTXgvSVNrMUtMUGY3ZkNyb3pMZEZ4b1hpZW94VkhET1ErRzhla3E5VG5qSkxSNG5jM2RTTzNNN2phckU5Z3RiCkNLTTYyRGUvOVFKQkFNRXZseEtXUkdTeDQ1Ymcrb3lWSUNxYTh1bXdFZnJQWTc2d0lvVmh2Z1A3UTVjQ1g3VmkKWGhCM2VSRTFMOVBMMFNtS2p3L2VOOW1yTUh2eFVDVVZBSWtDUUUyZTJVUkF4SDhSanpRdHVWNzZ1QzlWblllYgpRTTd1THg1OUVwcmxldkx4UkkwalpCSWNaNFQ3MENISFRBZjlYU240TEUyZkhYVTdITjBlbkcwaEtTRUNRQnhaCjhaL21zYTdkZEhzbUZWOGdXNUlsSDFVd1k5TWRNSlJCb1M5V0F0N3V0eUtvVklkNElqbmticjRad2lVaEdsY3cKWUlLQnFFeW5sUHY3bERsODlaRUNRQnVLZmxDMFlRbEViVy9FNGkrSkxxM2RCaHdsb2VWUmxaeWdmMEt5UnFoSwpTQW5OdE9OdTVEd0tadTZqNzE2U0lnL1Y2ODdZdWk5SlBCR0UyUE1ObThBPQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo="
+
+password:
+  private_key: "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlDWGdJQkFBS0JnUUM4aS8zQ0RCYTBrYTJuL2lBNzZ3TjFWbWNLekpUUmFkK0J3R3I2V0ZVcFFLeGhFeE42CnR2WEMyV2UyS3M5VEhQMUxHK0w5U1hGQ0NPMnVNS2Z5QnQxV2U1RUVBSEl1ampWNFRzSEtQdnZoUEZWZ2MwZGgKWmtMR0N3R1VNVnVOaEEzZXV2V0RPRmRIV25ZSjQrV1BIdG1CWFhIcnpYNHFZTnNJUEQ4ZHc2L1Byd0lEQVFBQgpBb0dCQUtYdkdqUEZ5ZEcraDdOYUxtb3RLWTBCcm92TmdvZE9ndnJCS2lVS3ltQVUzK0JMRnBDZ0ptZ0dSNFVGCjVoS0NaOVRMUlJpZW93TjNzaDNrQ2xveGVtYVhKNThVTzluRXgrR2hJMnhKdW53VFJKdHBGeFlXMDljWHJqVDMKUDBSQWZlQ09yVTRubGk5UnFUZXIzekRpUEhUUHVkb2ZwanZTaGFoMVNrbTFwZTB4QWtFQTd0eXphRlhyU0FDQgpxd2pDVWg5ZTRsSjJnbUhucFFGOFNUMWxrMzQvWDNTbi9JOXJHQkdkbGRJZmxmYTNpblk1UDcvUGY4YzBWNXlpCkR2LzVIc0xNNlFKQkFNb1RIL1FEdDhLYUpwb2MrSlNrZkxjK1pDeXNDMytNTVZvR0VJSWE0T1QvblZDMTR0ZWIKbFpMV2UxTFE0aHcrcEQ3UUhyaG44ZElUU3RwL0JhNTArTmNDUVFEVm94L3ptYVV1YVFXUTYreWhkdDF1bjBMUApxckY4cTY5MThpdi9sMU1uRlRlS2ROdmNVeVVXOHpDOCtFV0EyZXlxVCt4TzVPU3oxNnc2cmtjcWRDREJBa0VBCml5NGUvUCt1aXErSDFQQU5XcnZzVm4zM216a29ka0pHSDU0N3NwRDJ3Mk0zcEVhU3BqUTRFam4rR08xY1AxMzUKM0hXV0l5Y2N6TGVTLytrckxaek5Zd0pBWkZ2WGVwdmhuVCtsUjBwWHovUTVmMExLY3pPekRkbEt2VGRZWms4bgpoM09FcHVpNXZoSDNsZWR4bDR6ZWpuSU40bHdmb2hPcnVlYXlYNTBPcm9TUm13PT0KLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0K"
+
+pubkeys:
+  tetherfi: ""

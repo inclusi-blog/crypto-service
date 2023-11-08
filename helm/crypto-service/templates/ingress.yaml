@@ -1,0 +1,32 @@
+{{- if .Values.ingress.allowCryptoServicePath }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "gola-api.name" . }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Content-Type-Options nosniff;
+      add_header "X-XSS-Protection" "1;mode=block";
+spec:
+  rules:
+    {{- $values := .Values }}
+    {{- $apiName := include "gola-api.name" . }}
+    {{- range .Values.ingress.appFqdns }}
+      - host: {{ . | quote }}
+        http:
+          paths:
+            - path: {{ $values.ingress.path }}
+              pathType: Prefixx
+              backend:
+                service:
+                  name: {{ $apiName }}-svc
+                  port:
+                    number: {{ $values.service.port }}
+      {{- end }}
+  tls:
+    - hosts:
+        {{- range .Values.ingress.appFqdns }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .Values.ingress.appTLSSecret }}
+{{- end }}

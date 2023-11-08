@@ -2,18 +2,20 @@ version: '3.7'
 services:
 
   build-env:
-    image: gola05/golang_alpine:latest
+    image: golang:1.18.8-alpine3.16
     environment:
       - GO111MODULE=on
       - GOSUMDB=off
-      - GOPRIVATE=github.com/gola-glitch
+      - GOPRIVATE=github.com/inclusi-blog
+    platform: linux/amd64
     volumes:
       - type: volume
         source: crypto_dep
         target: /go
       - type: bind
         source: ../
-        target: /home/gola/crypto-service
-    working_dir: /home/gola/crypto-service
+        target: /crypto-service
+    working_dir: /crypto-service
+
 volumes:
   crypto_dep:

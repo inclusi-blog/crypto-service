@@ -1,7 +1,9 @@
-FROM gola05/golang_alpine:latest
+FROM golang:1.18.8-alpine3.16
 
-COPY ./bin/crypto-service /home/gola/crypto-service
+COPY ./bin/crypto-service /crypto-service
 
-WORKDIR /home/gola
+WORKDIR /
 
-CMD ["/home/gola/crypto-service"]
+RUN chmod +x crypto-service
+
+CMD ["/crypto-service"]
