@@ -24,7 +24,7 @@ func main() {
 	}
 	router := CreateRouter(configData)
 	tracing.Init(configData.TracingServiceName, configData.TracingOCAgentHost)
-	err := http.ListenAndServe(":8082", tracing.WithTracing(router, "/api/crypto/healthz"))
+	err := http.ListenAndServe(":8080", tracing.WithTracing(router, "/api/crypto/healthz"))
 	if err != nil {
 		logging.GetLogger(context.TODO()).Error("Could not start the server", err)
 	}
